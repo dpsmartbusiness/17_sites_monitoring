@@ -21,9 +21,9 @@ def create_parser():
     return parser
 
 
-def load_urls_for_cheking(urls_file):
-    with open(urls_file, 'r') as url:
-        return url.read().splitlines()
+def load_urls_for_cheking(urls_filepath):
+    with open(urls_filepath, 'r') as urls_file:
+        return urls_file.read().splitlines()
 
 
 def get_respond_200_url_list(url_list):
@@ -32,6 +32,8 @@ def get_respond_200_url_list(url_list):
         try:
             respond = requests.get(url)
         except requests.ConnectionError:
+            continue
+        except requests.exceptions.MissingSchema:
             continue
         if respond:
             respond_200_url_list.append(url)
@@ -42,18 +44,14 @@ def get_paid_for_month_url_list(url_list, days_in_month):
     paid_url_list = []
     for url in url_list:
         url_expiration_date = whois(url).expiration_date
-        delta = url_expiration_date - datetime.now()
+        if type(url_expiration_date) is list:
+            url_expiration_date = url_expiration_date[0]
+        elif url_expiration_date is None:
+            continue
+        delta = url_expiration_date - datetime.today()
         if delta.days > days_in_month:
             paid_url_list.append(url)
     return paid_url_list
-
-
-def print_health_domains(url_list, health_status):
-    for url in url_list:
-        print('Domain: {0:30} Health status: {1:}'.format(
-            url,
-            health_status
-        ))
 
 
 if __name__ == '__main__':
@@ -62,12 +60,20 @@ if __name__ == '__main__':
     urls_file = load_urls_for_cheking(args.urls_file)
     respond_200_url_list = get_respond_200_url_list(urls_file)
     paid_url_list = get_paid_for_month_url_list(
-        respond_200_url_list,
+        urls_file,
         args.days_in_month
     )
     not_respond_200_list = list(set(urls_file) - set(respond_200_url_list))
     not_paid_list = list(set(urls_file) - set(paid_url_list))
-    unhealthy_domain_list = list(set(not_respond_200_list) | set(not_paid_list))
-    healthy_domain_list = list(set(respond_200_url_list) & set(paid_url_list))
-    print_health_domains(healthy_domain_list, 'healthy')
-    print_health_domains(unhealthy_domain_list, 'unhealthy')
+    for url in respond_200_url_list:
+        print('\nUrl: {} \nRespond 200'.format(url))
+        if url in paid_url_list:
+            print('Domain paid more than {} days'.format(args.days_in_month))
+        else:
+            print('Domain paid less than {} days'.format(args.days_in_month))
+    for url in not_respond_200_list:
+        print('\nUrl: {} \nNot Respond 200'.format(url))
+        if url in not_paid_list:
+            print('Domain paid less than {} days'.format(args.days_in_month))
+        else:
+            print('Domain paid more than {} days'.format(args.days_in_month))
