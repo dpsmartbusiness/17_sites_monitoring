@@ -27,9 +27,13 @@ Example of program results:
 
 ``` bash
 
-Domain: http://yandex.ru, Health status: healthy
-Domain: http://mail.ru, Health status: healthy
-Domain: http://vk.com, Health status: healthy
+Url: https://mail.ru
+Respond 200
+Domain paid more than 30 days
+
+Url: https://vk.com
+Respond 200
+Domain paid more than 30 days
 
 ```
 
