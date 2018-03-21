@@ -28,12 +28,12 @@ Example of program results:
 ``` bash
 
 Url: https://mail.ru
-Respond 200
-Domain paid more than 30 days
+HTTP status 200: OK
+Domain paid more than 30 days: TRUE
 
 Url: https://vk.com
-Respond 200
-Domain paid more than 30 days
+HTTP status 200: OK
+Domain paid more than 30 days: TRUE
 
 ```
 
