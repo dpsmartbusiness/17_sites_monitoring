@@ -30,7 +30,7 @@ def get_respond_200_url_list(url_list):
     respond_200_url_list = []
     for url in url_list:
         try:
-            respond = requests.get(url)
+            respond = requests.get(url).ok
         except requests.ConnectionError:
             continue
         except requests.exceptions.MissingSchema:
@@ -54,6 +54,15 @@ def get_paid_for_month_url_list(url_list, days_in_month):
     return paid_url_list
 
 
+def print_http_status(url, status):
+    print('Url: {}'.format(url))
+    print('HTTP status 200: {}'.format(status))
+
+
+def print_payment_status(days_in_month, status):
+    print('Domain paid more than {} days: {}\n'.format(days_in_month, status))
+
+
 if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()
@@ -66,14 +75,14 @@ if __name__ == '__main__':
     not_respond_200_list = list(set(urls_file) - set(respond_200_url_list))
     not_paid_list = list(set(urls_file) - set(paid_url_list))
     for url in respond_200_url_list:
-        print('\nUrl: {} \nRespond 200'.format(url))
+        print_http_status(url, 'OK')
         if url in paid_url_list:
-            print('Domain paid more than {} days'.format(args.days_in_month))
+            print_payment_status(args.days_in_month, 'TRUE')
         else:
-            print('Domain paid less than {} days'.format(args.days_in_month))
+            print_payment_status(args.days_in_month, 'FALSE')
     for url in not_respond_200_list:
-        print('\nUrl: {} \nNot Respond 200'.format(url))
+        print_http_status(url, 'FALSE')
         if url in not_paid_list:
-            print('Domain paid less than {} days'.format(args.days_in_month))
+            print_payment_status(args.days_in_month, 'FALSE')
         else:
-            print('Domain paid more than {} days'.format(args.days_in_month))
+            print_payment_status(args.days_in_month, 'TRUE')
