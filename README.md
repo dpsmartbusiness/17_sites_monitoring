@@ -27,13 +27,16 @@ Example of program results:
 
 ``` bash
 
-Url: https://mail.ru
+1# Url: https://yandex.ru
 HTTP status 200: OK
 Domain paid more than 30 days: TRUE
 
-Url: https://vk.com
+
+2# Url: https://mail.ru
 HTTP status 200: OK
 Domain paid more than 30 days: TRUE
+
+3# string is empty. Check in your file
 
 ```
 
