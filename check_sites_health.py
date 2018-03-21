@@ -54,35 +54,30 @@ def get_paid_for_month_url_list(url_list, days_in_month):
     return paid_url_list
 
 
-def print_http_status(url, status):
-    print('Url: {}'.format(url))
+def print_http_status(url, status, number):
+    print('\n{}# Url: {}'.format(number, url))
     print('HTTP status 200: {}'.format(status))
 
 
 def print_payment_status(days_in_month, status):
-    print('Domain paid more than {} days: {}\n'.format(days_in_month, status))
+    print('Domain paid more than {} days: {}'.format(days_in_month, status))
 
 
 if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()
-    urls_file = load_urls_for_cheking(args.urls_file)
-    respond_200_url_list = get_respond_200_url_list(urls_file)
-    paid_url_list = get_paid_for_month_url_list(
-        urls_file,
-        args.days_in_month
-    )
-    not_respond_200_list = list(set(urls_file) - set(respond_200_url_list))
-    not_paid_list = list(set(urls_file) - set(paid_url_list))
-    for url in respond_200_url_list:
-        print_http_status(url, 'OK')
-        if url in paid_url_list:
-            print_payment_status(args.days_in_month, 'TRUE')
+    urls_list = load_urls_for_cheking(args.urls_file)
+    respond_200_url_list = get_respond_200_url_list(urls_list)
+    paid_url_list = get_paid_for_month_url_list(urls_list, args.days_in_month)
+    for number, url in list(enumerate(urls_list, start=1)):
+        if url == '':
+            print('\n{}# string is empty. Check in your file'.format(number))
         else:
-            print_payment_status(args.days_in_month, 'FALSE')
-    for url in not_respond_200_list:
-        print_http_status(url, 'FALSE')
-        if url in not_paid_list:
-            print_payment_status(args.days_in_month, 'FALSE')
-        else:
-            print_payment_status(args.days_in_month, 'TRUE')
+            if url in respond_200_url_list:
+                print_http_status(url, 'OK', number)
+            else:
+                print_http_status(url, 'False', number)
+            if url in paid_url_list:
+                print_payment_status(args.days_in_month, 'TRUE')
+            else:
+                print_payment_status(args.days_in_month, 'FALSE')
